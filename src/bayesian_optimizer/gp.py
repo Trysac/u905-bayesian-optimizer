@@ -12,7 +12,9 @@ from bayesian_optimizer.errors import OptimizerError
 
 KernelName = Literal["matern52", "rbf"]
 
-_LENGTH_SCALE_GRID: npt.NDArray[np.float64] = np.geomspace(0.01, 10.0, 30, dtype=np.float64)
+_LENGTH_SCALE_GRID: npt.NDArray[np.float64] = np.geomspace(0.01, 10.0, 30, dtype=np.float64).astype(
+    np.float64
+)
 _SQRT5 = math.sqrt(5.0)
 _MAX_SAMPLES = 2000
 _MAX_DIMS = 20
@@ -24,10 +26,8 @@ def _pairwise_distances(
 ) -> npt.NDArray[np.float64]:
     """Compute Euclidean pairwise distance matrix between rows of xa and xb."""
     diff = xa[:, np.newaxis, :] - xb[np.newaxis, :, :]
-    sq_dist: npt.NDArray[np.float64] = np.asarray(
-        np.sum(np.square(diff), axis=-1), dtype=np.float64
-    )
-    return np.asarray(np.sqrt(np.maximum(0.0, sq_dist)), dtype=np.float64)
+    sq_dist: npt.NDArray[np.float64] = np.array(np.sum(np.square(diff), axis=-1), dtype=np.float64)
+    return np.array(np.sqrt(np.maximum(0.0, sq_dist)), dtype=np.float64)
 
 
 def _compute_kernel(
@@ -39,9 +39,9 @@ def _compute_kernel(
     if kernel == "matern52":
         scaled = (_SQRT5 * dist) / length_scale
         poly = 1.0 + scaled + (5.0 * np.square(dist)) / (3.0 * length_scale * length_scale)
-        return np.asarray(poly * np.exp(-scaled), dtype=np.float64)
+        return np.array(poly * np.exp(-scaled), dtype=np.float64)
     scaled_sq = np.square(dist / length_scale)
-    return np.asarray(np.exp(-0.5 * scaled_sq), dtype=np.float64)
+    return np.array(np.exp(-0.5 * scaled_sq), dtype=np.float64)
 
 
 def _cholesky_with_jitter(
@@ -54,10 +54,10 @@ def _cholesky_with_jitter(
     diag_idx = np.diag_indices(n)
     jitter = 1e-10
     while jitter <= 1e-4 + 1e-15:
-        mat = base.copy()
+        mat: npt.NDArray[np.float64] = base.copy()
         mat[diag_idx] += noise + jitter
         try:
-            chol: npt.NDArray[np.float64] = np.asarray(np.linalg.cholesky(mat), dtype=np.float64)
+            chol: npt.NDArray[np.float64] = np.array(np.linalg.cholesky(mat), dtype=np.float64)
             return chol
         except np.linalg.LinAlgError:
             jitter *= 10.0
@@ -73,7 +73,7 @@ def _solve_cholesky(
 ) -> npt.NDArray[np.float64]:
     """Solve (chol @ chol.T) @ x = rhs via numpy linear solver on triangular factors."""
     z = np.linalg.solve(chol, rhs)
-    res: npt.NDArray[np.float64] = np.asarray(np.linalg.solve(chol.T, z), dtype=np.float64)
+    res: npt.NDArray[np.float64] = np.array(np.linalg.solve(chol.T, z), dtype=np.float64)
     return res
 
 

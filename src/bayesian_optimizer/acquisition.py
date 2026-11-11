@@ -14,13 +14,13 @@ _INV_SQRT2PI = 1.0 / math.sqrt(2.0 * math.pi)
 
 def _norm_cdf(z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
     """Standard normal cumulative distribution function."""
-    res: npt.NDArray[np.float64] = np.asarray(0.5 * _ERFC_VEC(-z * _INV_SQRT2), dtype=np.float64)
+    res: npt.NDArray[np.float64] = np.array(0.5 * _ERFC_VEC(-z * _INV_SQRT2), dtype=np.float64)
     return res
 
 
 def _norm_pdf(z: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
     """Standard normal probability density function."""
-    res: npt.NDArray[np.float64] = np.asarray(
+    res: npt.NDArray[np.float64] = np.array(
         _INV_SQRT2PI * np.exp(-0.5 * np.square(z)), dtype=np.float64
     )
     return res
