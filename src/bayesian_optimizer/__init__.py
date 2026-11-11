@@ -1,24 +1,25 @@
-"""
-Bayesian optimisation of expensive black-box functions with a hand-written Gaussian process and
-expected improvement or lower confidence bound
-"""
+"""Bayesian optimization of expensive black-box functions using a Gaussian Process."""
 
 from __future__ import annotations
 
-__all__ = ["__version__", "normalize"]
+from bayesian_optimizer import benchmarks
+from bayesian_optimizer.acquisition import expected_improvement, lower_confidence_bound
+from bayesian_optimizer.errors import ErrorCode, OptimizerError
+from bayesian_optimizer.gp import GaussianProcess
+from bayesian_optimizer.optimizer import Iteration, Result, minimize, random_search
+
+__all__ = [
+    "ErrorCode",
+    "GaussianProcess",
+    "Iteration",
+    "OptimizerError",
+    "Result",
+    "__version__",
+    "benchmarks",
+    "expected_improvement",
+    "lower_confidence_bound",
+    "minimize",
+    "random_search",
+]
 
 __version__ = "0.1.0"
-
-
-def normalize(value: str) -> str:
-    """Return ``value`` trimmed and lower-cased.
-
-    Placeholder API created by the template: replace it with the utility's real behavior.
-
-    Raises:
-        ValueError: if ``value`` is empty or only whitespace.
-    """
-    cleaned = value.strip()
-    if not cleaned:
-        raise ValueError("value must not be empty")
-    return cleaned.lower()

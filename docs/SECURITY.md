@@ -1,22 +1,14 @@
-# Security notes
+# Security
 
-## Threat model
+## Threat Model
 
-`trysac-bayesian-optimizer` is a pure library without I/O. The main risks are:
+### Defended
 
-- **Supply chain**: a compromised dependency or CI action. Mitigation: no runtime dependencies,
-  Dependabot weekly updates, actions pinned to major versions, minimal workflow permissions.
-- **Leaked secrets**: tokens committed by mistake. Mitigation: `gitleaks` runs in the local gates
-  and in CI; `.env` files are git-ignored.
-- **Insecure code**: shell injection, weak hashes, unsafe deserialization. Mitigation: Ruff's
-  `S` rules in lint and a `security` gate (Bandit, high severity fails, `# nosec` ignored); fix the
-  code instead of silencing it.
-- **Untrusted input**: callers may pass hostile strings. Mitigation: validate input and fail with
-  explicit exceptions; never `eval`, `exec` or deserialize untrusted data.
+- **Input Validation**: Enforces dimensional limits (1-20), valid budget (n_calls <= 500), and finite bounds.
+- **Error Handling**: `OptimizerError` prevents information leaks by truncating error messages to 200 characters.
+- **Numerical Stability**: Cholesky factorization utilizes iterative jitter escalation (`1e-10` to `1e-4`) to recover from singular matrices.
 
-## Publishing
+### Not Defended
 
-Releases are published to PyPI with trusted publishing (OIDC) when available, never with a
-long-lived token stored in the repository.
-
-To report a vulnerability, see [SECURITY.md](../SECURITY.md).
+- **Objective Function Safety**: The library executes the user-provided objective function in the same process; the user is responsible for sandboxing arbitrary execution.
+- **Denial of Service**: The optimization loop is bounded, but an extremely slow objective function can still cause process hang, as the library does not implement per-call timeouts.

@@ -17,7 +17,9 @@ classifiers = [
     "Operating System :: OS Independent",
     "Typing :: Typed",
 ]
-dependencies = []
+dependencies = [
+    "numpy>=2,<3",
+]
 
 [project.urls]
 Homepage = "https://github.com/Trysac/u905-bayesian-optimizer"
