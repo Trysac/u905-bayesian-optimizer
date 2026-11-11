@@ -9,4 +9,5 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Added deterministic Gaussian Process Bayesian optimization (`minimize`, `random_search`, `GaussianProcess`, `expected_improvement`, `lower_confidence_bound`, `benchmarks.branin`, `benchmarks.hartmann6`, and `OptimizerError`).
 - Initial project structure from the factory utility template.

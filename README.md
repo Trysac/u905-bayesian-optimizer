@@ -1,48 +1,42 @@
 # bayesian-optimizer
 
-[![PyPI version](https://img.shields.io/pypi/v/trysac-bayesian-optimizer)](https://pypi.org/project/trysac-bayesian-optimizer/)
-[![License: MIT](https://img.shields.io/pypi/l/trysac-bayesian-optimizer)](LICENSE)
-[![CI](https://github.com/Trysac/u905-bayesian-optimizer/actions/workflows/ci.yml/badge.svg)](https://github.com/Trysac/u905-bayesian-optimizer/actions/workflows/ci.yml)
+Bayesian optimisation of expensive black-box functions with a hand-written Gaussian process and expected improvement or lower confidence bound.
 
-Bayesian optimisation of expensive black-box functions with a hand-written Gaussian process and expected improvement or lower confidence bound
+## Installation
 
-## Problem
-
-Describe in two or three sentences the concrete problem this utility solves, who hits it, and what
-they do today without it. Replace this paragraph when the first real feature lands.
-
-## Install
-
-```sh
-pip install trysac-bayesian-optimizer
-# or
-uv add trysac-bayesian-optimizer
+```bash
+uv add bayesian-optimizer
 ```
-
-Requires Python 3.10 or newer. No runtime dependencies.
 
 ## Usage
 
 ```python
-import bayesian_optimizer
+from bayesian_optimizer import Iteration, minimize
+from bayesian_optimizer.benchmarks import branin
 
-# normalize() trims surrounding whitespace and lower-cases the text.
-print(bayesian_optimizer.normalize("  Hello World "))  # -> "hello world"
 
-# Blank input is rejected explicitly instead of returning an empty string.
-try:
-    bayesian_optimizer.normalize("   ")
-except ValueError as exc:
-    print(f"rejected: {exc}")
+def log_step(it: Iteration) -> None:
+    print(f"step={it.index:02d} y={it.y:.4f} best={it.best_y:.4f}")
+
+
+res = minimize(branin, [(-5.0, 10.0), (0.0, 15.0)], n_calls=15, seed=0, on_iteration=log_step)
+print(f"Best: {res.fun:.6f} at {res.x}")
 ```
 
-## Documentation
+## Public API Summary
 
-- [Architecture](docs/ARCHITECTURE.md) and [decisions](docs/decisions/)
-- [Testing](docs/TESTING.md) and [security](docs/SECURITY.md)
-- [Project record](docs/PROJECT.md) and [stack](docs/STACK.md)
-- [Changelog](CHANGELOG.md) and [contributing guide](CONTRIBUTING.md)
+- `minimize(...)`: Bayesian optimization loop.
+- `random_search(...)`: Uniform random search baseline.
+- `GaussianProcess(...)`: Exact GP regressor with Mat'ern 5/2 or RBF kernels.
+- `expected_improvement(...)` / `lower_confidence_bound(...)`: Acquisition functions.
+- `Result`: Dataclass containing optimization history and best finding.
+- `Iteration`: Progress snapshot.
+- `OptimizerError`: Typed exception with codes `invalid_bounds`, `invalid_budget`, `non_finite_value`, `invalid_acquisition`, `not_fitted`, `numerical_error`.
 
-## License
+Limits: 1-20 dimensions, 1 <= n_initial <= n_calls <= 500.
 
-[MIT](LICENSE) (c) 2026 Miguel Gomez
+## Why not <best-known alternative>
+
+Existing Bayesian optimisation packages (like scikit-optimize or Optuna) pull in large scientific stacks and are difficult to audit. This library provides a single small dependency, readable GP implementation, and fully deterministic runs useful for teaching and auditing.
+
+See [docs/SECURITY.md](docs/SECURITY.md) for details on threat modeling.

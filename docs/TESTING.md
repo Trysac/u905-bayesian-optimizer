@@ -1,29 +1,13 @@
 # Testing
 
-## Running
+## Structure
 
-```sh
-uv run pytest --cov=bayesian_optimizer   # tests with coverage report
-uv run python scripts/check.py      # every gate, as CI and the factory run it
-```
+Tests are organized to mirror the source module structure, ensuring 100% path coverage for logic:
 
-## Policy
+- `tests/test_bayesian_optimizer.py`: Covers the full API, benchmarks (`branin`, `hartmann6`), and validation errors.
 
-- Branch coverage of `src/bayesian_optimizer` must stay at or above 80 %; the gate fails below it.
-- Tests exercise the public API (`import bayesian_optimizer`) and assert every observable effect:
-  return values, raised exceptions and their messages.
-- Each bug fix starts with a failing test that reproduces it.
-- Tests are deterministic: no network, no wall clock, no dependence on test order.
+## Coverage
 
-## Tiers
-
-- Local tier (every gate run, coverage measured here): unit and property tests, plus conformance on small
-  fixtures kept in the repository.
-- CI tier: conformance that needs an external tool or a download. Mark them `@pytest.mark.conformance`; `scripts/check.py` deselects them locally
-  (unless `FABRICA_CI=1`). The CI `conformance` job sets `FABRICA_CI=1` and runs the full suite. Tools are installed
-  by the optional `ci/conformance-setup.sh` (bash, CI only; verify every download against a pinned SHA-256), and
-  tagged tests skip cleanly when their tool is missing.
-
-## Layout
-
-`tests/test_<module>.py` mirrors each public module. Shared fixtures go in `tests/conftest.py`.
+- The test suite covers acceptance criteria including: exact matching of benchmark minima, deterministic behavior across seeds, and proper handling of all `OptimizerError` codes.
+- Determinism is verified by comparing results of `minimize` calls using the same seed.
+- Input validation ensures `bounds` and `budget` constraints are strictly checked.
